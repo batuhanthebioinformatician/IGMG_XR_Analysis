@@ -1,4 +1,4 @@
-# filename: build_psn_and_cluster.py
+# filename: Build_psn_and_cluster.py
 """
 Builds a Protein Similarity Network (PSN) from a precomputed BLOSUM45 similarity
 matrix (CSV). Each node corresponds to a protein, and weighted edges represent
