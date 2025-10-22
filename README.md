@@ -54,3 +54,11 @@ Python ≥ 3.9
 Required libraries: numpy, pandas, biopython, tqdm, networkx, matplotlib, umap-learn, hdbscan, community, leidenalg, igraph, scikit-learn
 
 Docker (for TM-align structural comparisons)
+
+Installation and Repository Access
+Clone the Repository
+
+To obtain a local copy of this repository:
+
+git clone https://github.com/batuhanthebioinformatician/IGMG_XR_Analysis.git
+cd ITML_XR_Analysis
