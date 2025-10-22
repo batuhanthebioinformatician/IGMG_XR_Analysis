@@ -1,8 +1,12 @@
 # filename: build_psn_and_cluster.py
 """
-Build a Protein Similarity Network (PSN) from a precomputed BLOSUM45 similarity
-matrix (CSV), run community detection (Leiden or Louvain), and export results.
-
+Builds a Protein Similarity Network (PSN) from a precomputed BLOSUM45 similarity
+matrix (CSV). Each node corresponds to a protein, and weighted edges represent
+pairwise sequence similarity. The script constructs either a k-nearest-neighbor
+or threshold-based network, applies community detection (Leiden or Louvain), and
+exports cluster assignments and network files for downstream visualization or
+comparison with reference classifications.
+"""
 
 import json
 from pathlib import Path
@@ -10,30 +14,29 @@ import numpy as np
 import pandas as pd
 import networkx as nx
 
-# -------------------------- USER SETTINGS --------------------------
+# ------------------------------ PARAMETERS ------------------------------
 
-# Path to your similarity matrix (square CSV; rows/cols = Sequence IDs)
-sim_csv = r"C:\Users\batuh\Desktop\XR_BLOSUM45_similarity.csv"
+# Input similarity matrix (square CSV; rows/cols = sequence IDs)
+sim_csv = "XR_BLOSUM45_similarity.csv"
 
-# Choose graph mode:
-use_knn = True           # True → use k-NN graph, False → use threshold graph
-k_value = 10             # if use_knn=True
-threshold_value = 25000  # if use_knn=False (edge if sim ≥ threshold)
+# Graph construction mode
+use_knn = True          # True → use k-nearest-neighbor graph, False → use threshold-based graph
+k_value = 10            # number of neighbors if k-NN is used
+threshold_value = 25000 # similarity threshold if threshold-based mode is used
 
 # Clustering parameters
 cluster_method = "auto"  # "leiden", "louvain", or "auto"
 resolution = 1.0
 seed = 42
 
-# Optional reference labels file (for alignment/evaluation)
-ref_labels_csv = None  # e.g. r"C:\Users\batuh\Desktop\reference_labels.csv"
+# Optional reference labels (for evaluation)
+ref_labels_csv = None   # e.g. "reference_labels.csv"
 
-# Output prefix (no extension)
-out_prefix = r"C:\Users\batuh\Desktop\XR_PSN"
+# Output prefix
+out_prefix = "XR_PSN"
 
-# -------------------------------------------------------------------
+# ------------------------------------------------------------------------
 
-# Optional clustering backends
 try:
     import igraph as ig
     import leidenalg as la
@@ -42,12 +45,11 @@ except Exception:
     HAVE_LEIDEN = False
 
 try:
-    import community as community_louvain  # python-louvain
+    import community as community_louvain
     HAVE_LOUVAIN = True
 except Exception:
     HAVE_LOUVAIN = False
 
-# Optional evaluation tools
 try:
     from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
     from sklearn.metrics.cluster import contingency_matrix
@@ -57,10 +59,9 @@ except Exception:
     HAVE_SKLEARN = False
 
 
-# ------------------------------ Graph building ------------------------------
+# ------------------------------ GRAPH BUILDING ------------------------------
 
 def build_knn_psn(ids, sim, k):
-    """Build a k-NN graph from similarity matrix."""
     df = pd.DataFrame(sim, index=ids, columns=ids)
     G = nx.Graph()
     G.add_nodes_from(ids)
@@ -77,7 +78,6 @@ def build_knn_psn(ids, sim, k):
 
 
 def build_threshold_psn(ids, sim, tau):
-    """Build a threshold graph from similarity matrix."""
     n = len(ids)
     G = nx.Graph()
     G.add_nodes_from(ids)
@@ -89,11 +89,11 @@ def build_threshold_psn(ids, sim, tau):
     return G
 
 
-# ------------------------------ Clustering ------------------------------
+# ------------------------------ CLUSTERING ------------------------------
 
 def cluster_graph_leiden(G, resolution=1.0, seed=42):
     if not HAVE_LEIDEN:
-        raise RuntimeError("leidenalg + igraph not installed.")
+        raise RuntimeError("Leiden algorithm not available.")
     mapping = {node: idx for idx, node in enumerate(G.nodes())}
     inv_map = {v: k for k, v in mapping.items()}
     edges = [(mapping[u], mapping[v]) for u, v in G.edges()]
@@ -101,32 +101,35 @@ def cluster_graph_leiden(G, resolution=1.0, seed=42):
     g = ig.Graph(n=len(G), edges=edges, directed=False)
     g.es["weight"] = weights
     part = la.find_partition(
-        g, la.RBConfigurationVertexPartition,
-        weights="weight", resolution_parameter=resolution, seed=seed
+        g,
+        la.RBConfigurationVertexPartition,
+        weights="weight",
+        resolution_parameter=resolution,
+        seed=seed
     )
     return {inv_map[i]: int(c) for i, c in enumerate(part.membership)}
 
 
 def cluster_graph_louvain(G, resolution=1.0, seed=42):
     if not HAVE_LOUVAIN:
-        raise RuntimeError("python-louvain not installed.")
+        raise RuntimeError("Louvain algorithm not available.")
     import numpy as np
     rng_state = np.random.get_state()
     np.random.seed(seed)
     try:
-        part = community_louvain.best_partition(G, weight="weight",
-                                                resolution=resolution,
-                                                random_state=seed)
+        part = community_louvain.best_partition(
+            G, weight="weight", resolution=resolution, random_state=seed
+        )
     finally:
         np.random.set_state(rng_state)
     return {str(k): int(v) for k, v in part.items()}
 
 
-# ------------------------------ Label alignment ------------------------------
+# ------------------------------ LABEL ALIGNMENT ------------------------------
 
 def align_labels_to_reference(df_nodes, ref_col, psn_col):
     if not HAVE_SKLEARN:
-        raise RuntimeError("scikit-learn/scipy required for label alignment.")
+        raise RuntimeError("scikit-learn and scipy are required for label alignment.")
     C = contingency_matrix(df_nodes[ref_col], df_nodes[psn_col])
     r_ind, c_ind = linear_sum_assignment(C.max() - C)
     psn_unique = sorted(df_nodes[psn_col].unique())
@@ -139,16 +142,14 @@ def align_labels_to_reference(df_nodes, ref_col, psn_col):
     return mapping, ari, nmi, cm
 
 
-# ------------------------------ Main procedure ------------------------------
+# ------------------------------ MAIN ------------------------------
 
 def main():
-    # Load similarity matrix
     df_sim = pd.read_csv(sim_csv, index_col=0)
     ids = df_sim.index.tolist()
     sim = df_sim.values.astype(np.float64)
-    print(f"Loaded similarity matrix: {df_sim.shape[0]}×{df_sim.shape[1]}")
+    print(f"Loaded similarity matrix ({df_sim.shape[0]}×{df_sim.shape[1]})")
 
-    # Build graph
     if use_knn:
         G = build_knn_psn(ids, sim, k_value)
         graph_params = {"mode": "knn", "k": k_value}
@@ -156,34 +157,28 @@ def main():
         G = build_threshold_psn(ids, sim, threshold_value)
         graph_params = {"mode": "threshold", "tau": threshold_value}
 
-    # Select clustering method
     if cluster_method == "auto":
         method = "leiden" if HAVE_LEIDEN else ("louvain" if HAVE_LOUVAIN else None)
         if method is None:
-            raise RuntimeError("No clustering backend (Leiden or Louvain) available.")
+            raise RuntimeError("No clustering backend available.")
     else:
         method = cluster_method
 
-    # Cluster
     if method == "leiden":
         labels = cluster_graph_leiden(G, resolution, seed)
     else:
         labels = cluster_graph_louvain(G, resolution, seed)
 
-    # Node table
     df_nodes = pd.DataFrame({"Sequence_ID": list(G.nodes())})
     df_nodes["psn_cluster"] = df_nodes["Sequence_ID"].map(labels).astype(int)
     df_nodes = df_nodes.sort_values(["psn_cluster", "Sequence_ID"])
     df_nodes.to_csv(f"{out_prefix}_nodes.csv", index=False)
 
-    # Edge list
     edges = [(u, v, float(d.get("weight", 1.0))) for u, v, d in G.edges(data=True)]
     pd.DataFrame(edges, columns=["source", "target", "weight"]).to_csv(f"{out_prefix}_edges.csv", index=False)
 
-    # GEXF
     nx.write_gexf(G, f"{out_prefix}.gexf")
 
-    # Parameters
     params = {
         "source": {"type": "similarity_csv", "path": str(sim_csv)},
         "graph_params": graph_params,
@@ -194,13 +189,11 @@ def main():
     with open(f"{out_prefix}_params.json", "w", encoding="utf-8") as f:
         json.dump(params, f, indent=2)
 
-    # Optional reference alignment
     if ref_labels_csv:
         ref = pd.read_csv(ref_labels_csv)
         if not {"Sequence_ID", "ReferenceLabel"}.issubset(ref.columns):
-            raise ValueError("Reference CSV must have columns: Sequence_ID, ReferenceLabel")
-        merged = pd.merge(df_nodes, ref[["Sequence_ID", "ReferenceLabel"]],
-                          on="Sequence_ID", how="inner")
+            raise ValueError("Reference CSV must include 'Sequence_ID' and 'ReferenceLabel'.")
+        merged = pd.merge(df_nodes, ref[["Sequence_ID", "ReferenceLabel"]], on="Sequence_ID", how="inner")
         mapping, ari, nmi, cm = align_labels_to_reference(merged, "ReferenceLabel", "psn_cluster")
         pd.Series(mapping).rename_axis("psn_cluster").to_frame("mapped_to_ref").to_csv(
             f"{out_prefix}_label_alignment.csv")
@@ -211,7 +204,7 @@ def main():
 
     print(f"Graph: {G.number_of_nodes()} nodes, {G.number_of_edges()} edges")
     print(f"Clusters: {df_nodes['psn_cluster'].nunique()} ({method}, resolution={resolution})")
-    print(f"Files saved under prefix: {out_prefix}")
+    print(f"Saved outputs with prefix '{out_prefix}'")
 
 
 if __name__ == "__main__":
