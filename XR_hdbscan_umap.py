@@ -1,4 +1,4 @@
-# filename: xr_hdbscan_umap.py
+# filename: XR_hdbscan_umap.py
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
