@@ -1,2 +1,5 @@
 # ITML_XR_Analysis
-Computational analysis integrating information theory and machine learning for comparative genomics and structural analysis of phototrophic protein -xanthorhodopsins. Includes tools for BLOSUM-based similarity scoring, entropy profiling, clustering, and structural data integration.
+Computational analyses integrating information theory, machine learning, and graph theory
+for comparative genomics and structural analysis of a phototrophic protein -xanthorhodopsins. Includes tools for BLOSUM-based similarity scoring, entropy profiling,
+network construction, community detection, clustering, and structural data integration.
+
