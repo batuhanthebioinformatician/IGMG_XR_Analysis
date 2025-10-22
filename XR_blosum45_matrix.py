@@ -1,4 +1,4 @@
-# filename: xr_blosum45_matrix.py
+# filename: XR_blosum45_matrix.py
 import multiprocessing as mp
 from itertools import combinations
 from pathlib import Path
