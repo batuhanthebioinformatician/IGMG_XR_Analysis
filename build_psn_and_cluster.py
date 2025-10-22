@@ -3,8 +3,6 @@
 Build a Protein Similarity Network (PSN) from a precomputed BLOSUM45 similarity
 matrix (CSV), run community detection (Leiden or Louvain), and export results.
 
-This version uses explicit file paths set inside the script.
-"""
 
 import json
 from pathlib import Path
