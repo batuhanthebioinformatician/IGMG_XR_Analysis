@@ -61,4 +61,5 @@ Clone the Repository
 To obtain a local copy of this repository:
 
 git clone https://github.com/batuhanthebioinformatician/IGMG_XR_Analysis.git
+
 cd IGMG_XR_Analysis
