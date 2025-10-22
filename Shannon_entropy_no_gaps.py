@@ -1,4 +1,4 @@
-# filename: shannon_entropy_no_gaps.py
+# filename: Shannon_entropy_no_gaps.py
 import numpy as np
 import math
 import matplotlib.pyplot as plt
