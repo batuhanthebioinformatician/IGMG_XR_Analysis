@@ -1,4 +1,4 @@
-# filename: tm_align_matrix_docker.py
+# filename: Tm_align_matrix_docker.py
 import os
 import subprocess
 import tempfile
