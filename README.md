@@ -5,31 +5,31 @@ The scripts implement quantitative similarity scoring, unsupervised clustering, 
 
 Repository Overview
 Script	Description
-xr_blosum45_matrix.py	Computes a pairwise BLOSUM45 similarity and distance matrix from a multiple sequence alignment (MSA). Serves as a foundation for clustering and graph construction.
-xr_hdbscan_umap.py	Applies unsupervised clustering (HDBSCAN) to the similarity matrix and visualizes the relationships among proteins in 2D and 3D UMAP embeddings.
-tm_align_matrix_docker.py	Performs all-versus-all structural alignment using TM-align inside a Docker container to generate a symmetric TM-score matrix for structural comparison.
-shannon_entropy_no_gaps.py	Calculates position-wise Shannon entropy (natural log, gaps ignored) from an MSA to measure residue-level information content and evolutionary variability.
-build_psn_and_cluster.py	Builds a Protein Similarity Network (PSN) from a BLOSUM45 similarity matrix. Supports k-nearest-neighbor and threshold-based graph construction, followed by community detection (Leiden or Louvain). Outputs graph files for Gephi or Cytoscape visualization.
+XR_blosum45_matrix.py	Computes a pairwise BLOSUM45 similarity and distance matrix from a multiple sequence alignment (MSA). Serves as a foundation for clustering and graph construction.
+XR_hdbscan_umap.py applies unsupervised clustering (HDBSCAN) to the similarity matrix and visualizes the relationships among proteins in 2D and 3D UMAP embeddings.
+Tm_align_matrix_docker.py	performs all-versus-all structural alignment using TM-align inside a Docker container to generate a symmetric TM-score matrix for structural comparison.
+Shannon_entropy_no_gaps.py	calculates position-wise Shannon entropy (natural log, gaps ignored) from an MSA to measure residue-level information content and evolutionary variability.
+Build_psn_and_cluster.py	builds a Protein Similarity Network (PSN) from a BLOSUM45 similarity matrix. Supports k-nearest-neighbor and threshold-based graph construction, followed by community detection (Leiden or Louvain). Outputs graph files for Gephi or Cytoscape visualization.
 
 Workflow Summary
 
 1.Sequence Similarity and Information Content
 
-.Compute similarity and distance matrices using xr_blosum45_matrix.py.
+.Compute similarity and distance matrices using XR_blosum45_matrix.py.
 
-.Analyze sequence entropy using shannon_entropy_no_gaps.py.
+.Analyze sequence entropy using Shannon_entropy_no_gaps.py.
 
 2.Unsupervised Clustering and Dimensionality Reduction
 
-.Perform HDBSCAN-based clustering and UMAP visualization using xr_hdbscan_umap.py.
+.Perform HDBSCAN-based clustering and UMAP visualization using XR_hdbscan_umap.py.
 
 3.Structural Comparison
 
-.Use tm_align_matrix_docker.py to quantify 3D structural similarity among modeled or experimentally solved proteins.
+.Use Tm_align_matrix_docker.py to quantify 3D structural similarity among modeled or experimentally solved proteins.
 
 4.Network and Graph Analysis
 
-.Construct protein similarity networks with build_psn_and_cluster.py.
+.Construct protein similarity networks with Build_psn_and_cluster.py.
 
 .Detect community structures reflecting potential functional or evolutionary groupings.
 
