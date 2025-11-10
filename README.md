@@ -5,7 +5,7 @@ The scripts implement quantitative similarity scoring, unsupervised clustering, 
 
 Repository Overview
 Script	Description
-XR_blosum45_matrix.py	Computes a pairwise BLOSUM45 similarity and distance matrix from a multiple sequence alignment (MSA). Serves as a foundation for clustering and graph construction.
+XR_blosum45_matrix.py	computes a pairwise BLOSUM45 similarity and distance matrix from a multiple sequence alignment (MSA). Serves as a foundation for clustering and graph construction.
 XR_hdbscan_umap.py applies unsupervised clustering (HDBSCAN) to the similarity matrix and visualizes the relationships among proteins in 2D and 3D UMAP embeddings.
 Tm_align_matrix_docker.py	performs all-versus-all structural alignment using TM-align inside a Docker container to generate a symmetric TM-score matrix for structural comparison.
 Shannon_entropy_no_gaps.py	calculates position-wise Shannon entropy (natural log, gaps ignored) from an MSA to measure residue-level information content and evolutionary variability.
