@@ -1,4 +1,4 @@
-Comparative Genomics and Structural Analysis of Phototrophicity Across Diverse Environments — Machine Learning, Entropy, and Graph-Based Applications
+Comparative Genomics and Structural Analysis of Phototrophicity Across Diverse Environments - Machine Learning, Entropy, and Graph-Based Applications
 
 This repository provides computational tools integrating machine learning, information theory, and graph theory for comparative genomic and structural analysis of phototrophic proteins, with emphasis on xanthorhodopsins (XRs).
 The scripts implement quantitative similarity scoring, unsupervised clustering, entropy profiling, and graph-based community detection to study functional and evolutionary patterns across diverse environments.
